@@ -44,6 +44,4 @@ jobs:
       - name: Export instance IP
         id: export_ip
         working-directory: ./terraform
-        run: |
-          IP=$(terraform output -raw instance_public_ip)
-          echo "APP_SERVER_IP=$IP" >> $GITHUB_ENV   
+        run: echo "APP_SERVER_IP=$(terraform output -raw instance_public_ip)" >> $GITHUB_ENV
