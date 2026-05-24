@@ -30,7 +30,9 @@ jobs:
       - name: Export instance IP
         id: export_ip
         working-directory: ./terraform
-        run: echo "app_server_ip=$(terraform output -raw instance_public_ip)" >> $GITHUB_OUTPUT
+        run: |
+          echo "app_server_ip=$(terraform output -raw instance_public_ip)" >> $GITHUB_OUTPUT
+
 
 
   ansible:
