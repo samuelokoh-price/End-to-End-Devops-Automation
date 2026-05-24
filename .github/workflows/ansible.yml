@@ -10,7 +10,8 @@ jobs:
   ansible:
     runs-on: ubuntu-latest
     env:
-      APP_SERVER_IP: ${{ env.APP_SERVER_IP }}
+      APP_SERVER_IP: ${{ needs.terraform.outputs.app_server_ip }}
+
 
     steps:
       - name: Checkout code
