@@ -1,0 +1,31 @@
+name: Ansible CI/CD
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  ansible:
+    runs-on: ubuntu-latest
+    env:
+      APP_SERVER_IP: ${{ env.APP_SERVER_IP }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
+      - name: Syntax check playbook
+        working-directory: ./ansible
+        run: ansible-playbook playbooks/install_docker.yml --syntax-check
+
+      - name: Run Ansible playbook
+        working-directory: ./ansible
+        run: ansible-playbook playbooks/install_docker.yml -i inventory/terraform_inventory.py --limit $APP_SERVER_IP
+
