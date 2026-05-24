@@ -15,9 +15,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Terraform
+      - name: Install Terraform
         run: |
-          sudo apt-get update && sudo apt-get install -y terraform
+          sudo apt-get update && sudo apt-get install -y wget unzip
+          wget https://releases.hashicorp.com/terraform/1.9.0/terraform_1.9.0_linux_amd64.zip
+          unzip terraform_1.9.0_linux_amd64.zip
+          sudo mv terraform /usr/local/bin/
+          terraform -version
 
       - name: Terraform Init & Apply
         working-directory: ./terraform
@@ -27,6 +31,7 @@ jobs:
         id: export_ip
         working-directory: ./terraform
         run: echo "app_server_ip=$(terraform output -raw instance_public_ip)" >> $GITHUB_OUTPUT
+
 
   ansible:
     runs-on: ubuntu-latest
