@@ -15,28 +15,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Terraform
-        run: |
-          sudo apt-get update && sudo apt-get install -y wget unzip
-          wget https://releases.hashicorp.com/terraform/1.9.0/terraform_1.9.0_linux_amd64.zip
-          rm -rf terraform
-          unzip -o terraform_1.9.0_linux_amd64.zip
-          sudo mv terraform /usr/local/bin/
-          terraform -version
-
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.9.0
 
       - name: Terraform Init & Apply
-        working-directory: ./terraform
+        working-directory: ${{ github.workspace }}/terraform
         run: terraform init && terraform apply -auto-approve
 
       - name: Export instance IP
         id: export_ip
-        working-directory: ./terraform
+        working-directory: ${{ github.workspace }}/terraform
         run: |
           IP=$(terraform output -raw instance_public_ip | tr -d '\r')
           echo "app_server_ip=$IP" >> $GITHUB_OUTPUT
-
-
 
   ansible:
     runs-on: ubuntu-latest
@@ -56,7 +49,7 @@ jobs:
         run: echo "Using APP_SERVER_IP=$APP_SERVER_IP"
 
       - name: Run Ansible playbook
-        working-directory: ./ansible
+        working-directory: ${{ github.workspace }}/ansible
         run: ansible-playbook playbooks/install_docker.yml -i inventory/terraform_inventory.py --limit $APP_SERVER_IP
 
   app:
